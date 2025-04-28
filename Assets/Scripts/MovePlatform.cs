@@ -1,28 +1,38 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class MovePlatform : MonoBehaviour
 {
-    [SerializeField] private Transform _leftPosition;
-    [SerializeField] private Transform _rightPosition;
-    [SerializeField] private float _platformSpeed;
+     private Vector3 _leftPosition;
+     private Vector3 _rightPosition;
 
-    private Transform _targetPosition;
+    [SerializeField] private float _platformSpeed;
+    [SerializeField] private float _platformMoveDistance;
+
+    private Rigidbody _movePlatformRigidbody;
+
+    private Vector3 _move;
 
     private void Start()
     {
-        _targetPosition = _rightPosition;
-        _platformSpeed = 0.01f;
+        _platformMoveDistance = 3;
+        _move = new Vector3(1,0,0);
+        _platformSpeed = 5f;
+        _movePlatformRigidbody = GetComponent<Rigidbody>();
+        _leftPosition = transform.position + new Vector3(-_platformMoveDistance,0,0);
+        _rightPosition = transform.position + new Vector3(_platformMoveDistance, 0, 0);
     }
-    private void Update()
+    private void FixedUpdate()
     {
-        if (transform.position == _leftPosition.position)
+        if (Vector3.Distance(transform.position, _leftPosition) < 0.1)
         {
-            _targetPosition = _rightPosition;
+            _move = new Vector3(1, 0, 0);
         }
-        else if (transform.position == _rightPosition.position)
+        else if (Vector3.Distance(transform.position,_rightPosition) < 0.1)
         {
-            _targetPosition = _leftPosition;
+            _move = new Vector3(-1, 0, 0);
         }
-            transform.position = Vector3.MoveTowards(transform.position, _targetPosition.position, _platformSpeed);
+        _movePlatformRigidbody.MovePosition(transform.position + _move * _platformSpeed * Time.fixedDeltaTime);
+
     }
 }
